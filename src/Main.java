@@ -34,13 +34,7 @@
 *
 */
 
-
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * The main class.
@@ -49,28 +43,6 @@ import java.util.Map;
  * @version 1.0.0
  */
 public class Main {
-
-    /** Global hash-map (some kind of an array):
-     * Key is of type Integer (we will use character codes as key).
-     * Content of hash-map is of type CharProp.
-     * Name of hash-map is "chars" (characters).
-     */
-    static HashMap <Integer, CharacterProperty> chars = new HashMap<>();
-
-    /** Useful hash-map methods:
-     * chars.get()		Returns the contents of a key.
-     * chars.put()		Add an element to the map.
-     * chars.remove()	Remove an element from the map.
-     * chars.size()		Returns number of keys in map.
-     * chars.containsKey()	Returns true if key is in map.
-     * chars.keySet()	Returns a set of all keys in this map.
-     */
-
-    /**
-     * Global counter variable:
-     */
-    static double fileCharactersCount = 0;
-    static double fileEntropy = 0;
 
     /**
      * Main method. The program starts here.
@@ -106,138 +78,18 @@ public class Main {
         // Yes, command line argument is okay.
         System.out.println( "Data file " + s + " exists.");
 
+        Entropy entropy = new Entropy();
+
         // Call each method
-        ReadInputTextFileCharacters(s);
-        ComputeProbabilities();
-        ComputeInformation();
-        ComputeEntropy();
-        PrintOutCharProps();
+        entropy.readInputTextFileCharacters(s);
+        entropy.computeProbabilities();
+        entropy.computeInformation();
+        entropy.computeEntropy();
+        entropy.printOutCharProps();
 
         // Print goodbye message
         System.out.println("Done.");
         System.out.println("======================================================");
     }
 
-    /**
-     * Base 2 logarithm.
-     *
-     * @param d The value to compute the the logarithm.
-     * @return The result value.
-     */
-    static double log2(double d) {
-        return Math.log(d)/Math.log(2.0);
-    }
-
-    /**
-     * Read character from file and count them.
-     *
-     * @param relativeFilePath The relative file path.
-     */
-    static void ReadInputTextFileCharacters(String relativeFilePath) {
-        System.out.println("Reading file ...");
-
-        // Open file and read character by character:
-        try (BufferedReader in = new BufferedReader(new FileReader(relativeFilePath))) {
-            int c;
-            // Read characters c until there are no more:
-            while ((c = in.read()) != -1) {
-                /*
-                 * ToDo: [1.1] implement computation of each character.
-                 * */
-                if(!chars.containsKey(c)) {
-                    chars.put(c, new CharacterProperty(c, 1, 0, 0));
-                } else {
-                    chars.get(c).updateOccurrenceBy(1);
-                }
-
-                /*
-                 * ToDo: [1.2] count all characters in the file.
-                 * */
-                fileCharactersCount++;
-            }
-        }
-        catch(IOException ioe) {}
-    }
-
-    /**
-     * Compute probability of each character in hash-map.
-     */
-    static void ComputeProbabilities() {
-
-        System.out.println( "Computing probabilities...");
-        /*
-         * ToDo: [2] implement computation of the probability for each character.
-         *
-         * */
-
-        // Parse through all hash-map keys:
-        for (Map.Entry<Integer, CharacterProperty> entry : chars.entrySet()) {
-            CharacterProperty property = entry.getValue();
-            int occurrence = property.getOccurrence();
-            double probability = (double)occurrence / fileCharactersCount;
-            property.setProbability(probability);
-        }
-    }
-
-    /**
-     * Compute information for each character in hash-map.
-     */
-    static void ComputeInformation() {
-
-        System.out.println( "Computing information...");
-        /*
-         * ToDo: [3] implement computation of the information for each character.
-         *
-         * */
-
-        // Parse through all hash-map keys:
-        for (Map.Entry<Integer, CharacterProperty> entry : chars.entrySet()) {
-            CharacterProperty property = entry.getValue();
-            double probability = property.getProbability();
-            double information = log2(1 / probability);
-            property.setInformation(information);
-        }
-    }
-
-    /**
-     * Compute entropy of all characters in hash-map.
-     */
-    static void ComputeEntropy() {
-        System.out.println( "Computing entropy...");
-        double sum = 0;
-        /*
-         * ToDo: [4] implement computation of the entropy of all characters.
-         *           Send the entropy value back as a result.
-         * */
-
-        for(Map.Entry<Integer, CharacterProperty> entry : chars.entrySet()) {
-            CharacterProperty property = entry.getValue();
-            double probability = property.getProbability();
-            sum += probability * log2(1 / probability);
-        }
-
-        fileEntropy = sum;
-    }
-
-    /**
-     * Print result table with occurrence, probability and information.
-     */
-    static void PrintOutCharProps() {
-        // Print general statistics
-        System.out.println("Character types in file: " + chars.size());
-        System.out.println("Number of character in file: " + fileCharactersCount);
-        System.out.println("Entropy of file: " + fileEntropy);
-        System.out.println(" ");
-
-        // Print character statistics:
-        for (Map.Entry<Integer, CharacterProperty> entry : chars.entrySet()) {
-            CharacterProperty property = entry.getValue();
-            String c = property.getCharacterAsString();
-            int o = property.getOccurrence();
-            double p = property.getProbability();
-            double i = property.getInformation();
-
-            System.out.format("  %5s : o=%8d  p=%1.10f  i=%-2.10f%n", c, o, p, i);
-        }
-    }
 }
