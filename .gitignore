@@ -26,3 +26,6 @@ hs_err_pid*
 out/
 .idea/
 META-INF/
+
+# ignore iml files
+*.iml
